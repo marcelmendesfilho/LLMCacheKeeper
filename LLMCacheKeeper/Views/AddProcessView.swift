@@ -7,9 +7,12 @@ struct AddProcessView: View {
 
     @State private var name: String = ""
     @State private var pid: String = ""
+    @State private var selectedTTY: String = ""
+    @State private var selectedCommand: String = ""
     @State private var text: String = ""
     @State private var interval: String = "5"
     @State private var typingDelay: String = "5"
+    @State private var showingPIDPicker = false
 
     private var isValid: Bool {
         guard Int(pid) != nil, !text.isEmpty,
@@ -29,8 +32,23 @@ struct AddProcessView: View {
                         .textFieldStyle(.roundedBorder)
                 }
                 Section("Target") {
-                    TextField("PID", text: $pid)
-                        .textFieldStyle(.roundedBorder)
+                    HStack {
+                        TextField("PID", text: $pid)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 100)
+
+                        if !selectedCommand.isEmpty {
+                            Text("\(selectedCommand)  ·  \(selectedTTY)")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Button("Pick…") {
+                            showingPIDPicker = true
+                        }
+                    }
                     TextField("Binary path", text: $binaryPath)
                         .textFieldStyle(.roundedBorder)
                     Toggle("Use sudo", isOn: $useSudo)
@@ -72,7 +90,14 @@ struct AddProcessView: View {
             .padding(.horizontal)
         }
         .padding()
-        .frame(width: 500, height: 460)
+        .frame(width: 520, height: 480)
+        .sheet(isPresented: $showingPIDPicker) {
+            PIDPickerView(binaryPath: binaryPath) { entry in
+                pid = "\(entry.pid)"
+                selectedTTY = entry.tty
+                selectedCommand = entry.command
+            }
+        }
     }
 
     let onAdd: (ProcessParameters) -> Void
