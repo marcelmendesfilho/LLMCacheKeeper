@@ -7,13 +7,19 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* MyTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MyTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* LLMCacheKeeperCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LLMCacheKeeperCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		4884A7A5302E163100E06C77 /* LLMCacheKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LLMCacheKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000010 /* MyTool */ = {
+		000000000000000000000010 /* LLMCacheKeeperCLI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MyTool;
+			path = LLMCacheKeeperCLI;
+			sourceTree = "<group>";
+		};
+		4884A7A6302E163100E06C77 /* LLMCacheKeeper */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LLMCacheKeeper;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -24,13 +30,19 @@
 			files = (
 			);
 		};
+		4884A7A2302E163100E06C77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000010 /* MyTool */,
+				000000000000000000000010 /* LLMCacheKeeperCLI */,
+				4884A7A6302E163100E06C77 /* LLMCacheKeeper */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -38,7 +50,8 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* MyTool */,
+				000000000000000000000120 /* LLMCacheKeeperCLI */,
+				4884A7A5302E163100E06C77 /* LLMCacheKeeper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -46,9 +59,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* MyTool */ = {
+		000000000000000100000000 /* LLMCacheKeeperCLI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "MyTool" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "LLMCacheKeeperCLI" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -56,12 +69,30 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* MyTool */,
+				000000000000000000000010 /* LLMCacheKeeperCLI */,
 			);
-			name = MyTool;
+			name = LLMCacheKeeperCLI;
 			productName = Tool;
-			productReference = 000000000000000000000120 /* MyTool */;
+			productReference = 000000000000000000000120 /* LLMCacheKeeperCLI */;
 			productType = "com.apple.product-type.tool";
+		};
+		4884A7A4302E163100E06C77 /* LLMCacheKeeper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4884A7AF302E163300E06C77 /* Build configuration list for PBXNativeTarget "LLMCacheKeeper" */;
+			buildPhases = (
+				4884A7A1302E163100E06C77 /* Sources */,
+				4884A7A2302E163100E06C77 /* Frameworks */,
+				4884A7A3302E163100E06C77 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				4884A7A6302E163100E06C77 /* LLMCacheKeeper */,
+			);
+			name = LLMCacheKeeper;
+			productName = LLMCacheKeeper;
+			productReference = 4884A7A5302E163100E06C77 /* LLMCacheKeeper.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -76,9 +107,12 @@
 					000000000000000100000000 = {
 						CreatedOnToolsVersion = 27.0;
 					};
+					4884A7A4302E163100E06C77 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Untitled Project" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "LLMCacheKeeper" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -92,10 +126,19 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* MyTool */,
+				000000000000000100000000 /* LLMCacheKeeperCLI */,
+				4884A7A4302E163100E06C77 /* LLMCacheKeeper */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4884A7A3302E163100E06C77 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		000000000000000120000000 /* Sources */ = {
@@ -103,10 +146,15 @@
 			files = (
 			);
 		};
+		4884A7A1302E163100E06C77 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "Untitled Project" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "LLMCacheKeeper" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -176,7 +224,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "Untitled Project" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "LLMCacheKeeper" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -238,7 +286,7 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "MyTool" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "LLMCacheKeeperCLI" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -253,7 +301,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "MyTool" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "LLMCacheKeeperCLI" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -268,22 +316,96 @@
 			};
 			name = Release;
 		};
+		4884A7AD302E163300E06C77 /* Debug configuration for PBXNativeTarget "LLMCacheKeeper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29YKME3999;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marcelmendesfilho.LLMCacheKeeper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4884A7AE302E163300E06C77 /* Release configuration for PBXNativeTarget "LLMCacheKeeper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29YKME3999;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marcelmendesfilho.LLMCacheKeeper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "Untitled Project" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "LLMCacheKeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "Untitled Project" */,
-				000000000000000012000000 /* Release configuration for PBXProject "Untitled Project" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "LLMCacheKeeper" */,
+				000000000000000012000000 /* Release configuration for PBXProject "LLMCacheKeeper" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "MyTool" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "LLMCacheKeeperCLI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "MyTool" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "MyTool" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "LLMCacheKeeperCLI" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "LLMCacheKeeperCLI" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		4884A7AF302E163300E06C77 /* Build configuration list for PBXNativeTarget "LLMCacheKeeper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4884A7AD302E163300E06C77 /* Debug configuration for PBXNativeTarget "LLMCacheKeeper" */,
+				4884A7AE302E163300E06C77 /* Release configuration for PBXNativeTarget "LLMCacheKeeper" */,
 			);
 			defaultConfigurationName = Release;
 		};
