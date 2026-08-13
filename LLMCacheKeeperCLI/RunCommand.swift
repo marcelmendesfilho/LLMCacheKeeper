@@ -106,7 +106,8 @@ enum RunCommand {
                 // 3) Inject the ENTER (\r) in isolation.
                 try Injector.inject(ttyPath: ttyPath, payload: "\r", interCharDelayUs: 0)
                 let ts = ISO8601DateFormatter().string(from: Date())
-                print("[\(ts)] #\(iteration) injected into PID \(pid) (\(ttyPath))")
+                print("[\(ts)] \(text)")
+                fflush(stdout)
             } catch let e as InjectorError {
                 Fail.print(e.description)
                 exit(EXIT_FAILURE)
