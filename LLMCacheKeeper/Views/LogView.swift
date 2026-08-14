@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LogView: View {
     @Bindable var process: LLMCacheKeeperProcess
+    private let bottomID = "log-bottom"
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,16 +16,27 @@ struct LogView: View {
             Divider()
 
             ScrollViewReader { proxy in
-                ScrollView {
-                    Text(process.output.isEmpty ? "No output yet." : process.output)
-                        .font(.system(.body, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .padding(8)
-                        .id("bottom")
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(process.output.isEmpty ? "No output yet." : process.output)
+                            .font(.system(.body, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+
+                        Color.clear
+                            .frame(height: 1)
+                            .id(bottomID)
+                    }
+                    .padding(8)
                 }
+                .scrollIndicators(.visible)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onChange(of: process.output) { _, _ in
-                    proxy.scrollTo("bottom", anchor: .bottom)
+                    proxy.scrollTo(bottomID, anchor: .bottom)
+                }
+                .onAppear {
+                    proxy.scrollTo(bottomID, anchor: .bottom)
                 }
             }
         }
