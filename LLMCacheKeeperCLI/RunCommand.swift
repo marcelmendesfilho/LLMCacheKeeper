@@ -1,8 +1,6 @@
 import Foundation
 import Darwin
-
-// MARK: - SIGINT flag (referenced by the C signal handler)
-fileprivate var LLMCacheKeeperCLIStopped: Bool = false
+import Dispatch
 
 // MARK: - RunCommand (default mode)
 enum RunCommand {
@@ -21,10 +19,19 @@ enum RunCommand {
         let text = arguments[1]
 
         // Parse interval in seconds (accepts decimals)
-        guard let interval = Double(arguments[2]), interval > 0 else {
+        guard let interval = Double(arguments[2]),
+              interval.isFinite,
+              interval > 0,
+              interval <= Double(Int.max) / 1_000_000_000 else {
             Fail.print("Invalid interval: '\(arguments[2])'. Use a number > 0 in seconds.")
             exit(EXIT_FAILURE)
         }
+        let intervalNanoseconds = max(1, Int(interval * 1_000_000_000))
+        let intervalDelay = DispatchTimeInterval.nanoseconds(intervalNanoseconds)
+        // Five percent of the interval (capped at one second) lets macOS
+        // coalesce wakeups without noticeably changing the configured cadence.
+        let leewayNanoseconds = min(1_000_000_000, max(1, intervalNanoseconds / 20))
+        let timerLeeway = DispatchTimeInterval.nanoseconds(leewayNanoseconds)
 
         // Optional inter-character delay (default 5ms). Mimics human typing to
         // bypass paste detection in modern TUI apps (Codex/Claude) that would
@@ -70,11 +77,6 @@ enum RunCommand {
             exit(EXIT_FAILURE)
         }
 
-        // SIGINT handler (Ctrl-C) — a C signal handler cannot capture local
-        // scope, so we use a module-level flag.
-        LLMCacheKeeperCLIStopped = false
-        signal(SIGINT) { _ in LLMCacheKeeperCLIStopped = true }
-
         // Banner
         print("LLMCacheKeeperCLI started.")
         print("  PID:        \(pid)")
@@ -85,11 +87,20 @@ enum RunCommand {
         print("  Method:     TIOCSTI (direct ioctl on /dev/tty)")
         print("  Root:       \(getuid() == 0 ? "yes" : "no")")
         print("Press Ctrl-C to stop.")
+        fflush(stdout)
 
+        // Timer and signal events share a serial queue. The timer is scheduled
+        // as a one-shot after each injection so slow typing never overlaps or
+        // causes missed intervals to fire back-to-back.
+        let schedulerQueue = DispatchQueue(label: "com.llmcachekeeper.scheduler")
+        let timer = DispatchSource.makeTimerSource(queue: schedulerQueue)
+        signal(SIGINT, SIG_IGN)
+        let interruptSource = DispatchSource.makeSignalSource(signal: SIGINT, queue: schedulerQueue)
         var iteration = 0
 
-        while !LLMCacheKeeperCLIStopped {
+        timer.setEventHandler {
             iteration += 1
+
             // Check PID before each injection
             guard Injector.pidExists(pid) else {
                 Fail.print("PID \(pid) disappeared (session terminated). Aborting.")
@@ -116,26 +127,27 @@ enum RunCommand {
                 exit(EXIT_FAILURE)
             }
 
-            // Fractional sleep so we respond to SIGINT promptly
-            let totalMillis = UInt32(interval * 1000)
-            let chunkMs: UInt32 = 100
-            var remaining = totalMillis
-            while remaining > 0 && !LLMCacheKeeperCLIStopped {
-                let sleepMs = min(remaining, chunkMs)
-                usleep(sleepMs * 1000)
-                if remaining >= sleepMs { remaining -= sleepMs } else { remaining = 0 }
-            }
+            timer.schedule(deadline: .now() + intervalDelay, leeway: timerLeeway)
         }
 
-        print("\nStopped. Exiting after \(iteration) iteration(s).")
-        exit(EXIT_SUCCESS)
+        interruptSource.setEventHandler {
+            timer.cancel()
+            print("\nStopped. Exiting after \(iteration) iteration(s).")
+            fflush(stdout)
+            exit(EXIT_SUCCESS)
+        }
+
+        interruptSource.resume()
+        timer.schedule(deadline: .now())
+        timer.resume()
+        dispatchMain()
     }
 }
 
 // MARK: - Fail helper
 enum Fail {
     static func print(_ message: String) {
-        var stdErr = FileHandle.standardError
+        let stdErr = FileHandle.standardError
         let data = "Error: \(message)\n".data(using: .utf8) ?? Data()
         stdErr.write(data)
     }
