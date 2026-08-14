@@ -3,7 +3,7 @@ import Foundation
 @Observable
 final class LLMCacheKeeperProcess: Identifiable {
     let id: UUID
-    let parameters: ProcessParameters
+    private(set) var parameters: ProcessParameters
 
     private(set) var status: ProcessStatus = .idle
     private(set) var output: String = ""
@@ -190,6 +190,23 @@ final class LLMCacheKeeperProcess: Identifiable {
     func restart() async {
         // Re-run with the same parameters (will re-prompt for sudo password).
         await start()
+    }
+
+    @discardableResult
+    func updateParameters(_ parameters: ProcessParameters) -> Bool {
+        guard status == .stopped else { return false }
+
+        self.parameters = ProcessParameters(
+            id: id,
+            name: parameters.name,
+            pid: parameters.pid,
+            text: parameters.text,
+            interval: parameters.interval,
+            typingDelay: parameters.typingDelay,
+            binaryPath: parameters.binaryPath,
+            useSudo: parameters.useSudo
+        )
+        return true
     }
 
     func appendOutput(_ text: String) {

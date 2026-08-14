@@ -2,14 +2,24 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var appState = AppState()
-    @State private var showingAdd = false
+    @State private var presentedSheet: ProcessSheet?
     @State private var selectedID: UUID?
     @State private var showingStopAllConfirmation = false
+    @State private var showingEditUnavailableAlert = false
+    @State private var unavailableEditStatus = ProcessStatus.idle
 
     var body: some View {
         NavigationSplitView {
             sidebar
                 .navigationSplitViewColumnWidth(320)
+                .alert(
+                    "Editing Unavailable",
+                    isPresented: $showingEditUnavailableAlert,
+                    presenting: unavailableEditStatus
+                ) { _ in
+                } message: { status in
+                    Text("This item can only be edited when its status is Stopped. Its current status is \(status.rawValue.capitalized).")
+                }
         } detail: {
             if let selectedID,
                let proc = appState.processes.first(where: { $0.id == selectedID }) {
@@ -18,12 +28,20 @@ struct ContentView: View {
                 emptyDetail
             }
         }
-        .sheet(isPresented: $showingAdd) {
-            AddProcessView(
-                binaryPath: $appState.binaryPath,
-                useSudo: $appState.useSudo,
-                onAdd: { appState.addProcess(parameters: $0) }
-            )
+        .sheet(item: $presentedSheet) { sheet in
+            switch sheet {
+            case .add:
+                AddProcessView(
+                    defaultBinaryPath: appState.binaryPath,
+                    defaultUseSudo: appState.useSudo,
+                    onSave: addProcess
+                )
+            case .edit(let process):
+                AddProcessView(
+                    parameters: process.parameters,
+                    onSave: { appState.updateProcess(id: process.id, parameters: $0) }
+                )
+            }
         }
         .alert("Stop All LLMCacheKeepers?", isPresented: $showingStopAllConfirmation) {
             Button("Cancel", role: .cancel) {}
@@ -36,7 +54,7 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    showingAdd = true
+                    presentedSheet = .add
                 } label: {
                     Label("New LLMCacheKeeper", systemImage: "plus")
                 }
@@ -73,6 +91,7 @@ struct ContentView: View {
                                 }
                             },
                             onSelect: { selectedID = proc.id },
+                            onDoubleClick: { editProcess(proc) },
                             isSelected: selectedID == proc.id
                         )
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -98,5 +117,23 @@ struct ContentView: View {
             systemImage: "rectangle.split.2x1",
             description: Text("Choose a process in the sidebar to view its output")
         )
+    }
+
+    private func addProcess(parameters: ProcessParameters) {
+        appState.binaryPath = parameters.binaryPath
+        appState.useSudo = parameters.useSudo
+        appState.addProcess(parameters: parameters)
+    }
+
+    private func editProcess(_ process: LLMCacheKeeperProcess) {
+        selectedID = process.id
+
+        guard process.status == .stopped else {
+            unavailableEditStatus = process.status
+            showingEditUnavailableAlert = true
+            return
+        }
+
+        presentedSheet = .edit(process)
     }
 }

@@ -16,6 +16,14 @@ final class AppState {
         }
     }
 
+    @discardableResult
+    func updateProcess(id: UUID, parameters: ProcessParameters) -> Bool {
+        guard let process = processes.first(where: { $0.id == id }) else {
+            return false
+        }
+        return process.updateParameters(parameters)
+    }
+
     func removeProcess(at offsets: IndexSet) {
         offsets.compactMap { processes[$0] }.forEach { $0.stop() }
         processes.remove(atOffsets: offsets)

@@ -5,6 +5,7 @@ struct ProcessRowView: View {
     let onStop: () -> Void
     let onRestart: () -> Void
     let onSelect: () -> Void
+    let onDoubleClick: () -> Void
     let isSelected: Bool
 
     private var title: String {
@@ -55,6 +56,8 @@ struct ProcessRowView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: .rect(cornerRadius: 8))
         .contentShape(.rect)
+        .onTapGesture(count: 2, perform: onDoubleClick)
         .onTapGesture { onSelect() }
+        .accessibilityAction(named: "Edit", onDoubleClick)
     }
 }

@@ -2,17 +2,49 @@ import SwiftUI
 
 struct AddProcessView: View {
     @Environment(\.dismiss) private var dismiss
-    @Binding var binaryPath: String
-    @Binding var useSudo: Bool
 
-    @State private var name: String = ""
-    @State private var pid: String = ""
+    @State private var name: String
+    @State private var pid: String
     @State private var selectedTTY: String = ""
     @State private var selectedCommand: String = ""
-    @State private var text: String = ""
-    @State private var interval: String = "5"
-    @State private var typingDelay: String = "5"
+    @State private var text: String
+    @State private var interval: String
+    @State private var typingDelay: String
+    @State private var binaryPath: String
+    @State private var useSudo: Bool
     @State private var showingPIDPicker = false
+
+    private let processID: UUID
+    private let isEditing: Bool
+    private let onSave: (ProcessParameters) -> Void
+
+    init(
+        defaultBinaryPath: String = "",
+        defaultUseSudo: Bool = true,
+        parameters: ProcessParameters? = nil,
+        onSave: @escaping (ProcessParameters) -> Void
+    ) {
+        let initialParameters = parameters ?? ProcessParameters(
+            name: "",
+            pid: "",
+            text: "",
+            interval: "5",
+            typingDelay: "5",
+            binaryPath: defaultBinaryPath,
+            useSudo: defaultUseSudo
+        )
+
+        processID = initialParameters.id
+        isEditing = parameters != nil
+        self.onSave = onSave
+        _name = State(initialValue: initialParameters.name)
+        _pid = State(initialValue: initialParameters.pid)
+        _text = State(initialValue: initialParameters.text)
+        _interval = State(initialValue: initialParameters.interval)
+        _typingDelay = State(initialValue: initialParameters.typingDelay)
+        _binaryPath = State(initialValue: initialParameters.binaryPath)
+        _useSudo = State(initialValue: initialParameters.useSudo)
+    }
 
     private var isValid: Bool {
         guard Int(pid) != nil, !text.isEmpty,
@@ -23,7 +55,7 @@ struct AddProcessView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("New LLMCacheKeeper")
+            Text(isEditing ? "Edit LLMCacheKeeper" : "New LLMCacheKeeper")
                 .font(.title2.bold())
 
             Form {
@@ -71,8 +103,9 @@ struct AddProcessView: View {
                 Spacer()
                 Button("Cancel") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button("Start") {
+                Button(isEditing ? "Save" : "Start") {
                     let params = ProcessParameters(
+                        id: processID,
                         name: name,
                         pid: pid,
                         text: text,
@@ -81,7 +114,7 @@ struct AddProcessView: View {
                         binaryPath: binaryPath,
                         useSudo: useSudo
                     )
-                    onAdd(params)
+                    onSave(params)
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
@@ -100,5 +133,4 @@ struct AddProcessView: View {
         }
     }
 
-    let onAdd: (ProcessParameters) -> Void
 }
