@@ -6,13 +6,12 @@ struct PIDEntry: Identifiable, Hashable {
     let command: String
     let tabTitle: String
 
-    var id: Int { pid }
+    var id: String { tty }
 }
 
 enum PIDScanner {
     /// Runs `LLMCacheKeeperCLI -list` and parses the output into a sorted list
-    /// of PIDEntry items. The CLI prints a two-line header then one row per
-    /// process. Columns are fixed-width (pid 10, tty 16, command 37, title).
+    /// of PIDEntry items. The CLI returns one tab-separated row per valid TTY.
     static func scan(binaryPath: String) async -> [PIDEntry] {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: binaryPath)
@@ -47,28 +46,26 @@ enum PIDScanner {
         var entries: [PIDEntry] = []
         for line in output.split(separator: "\n", omittingEmptySubsequences: true) {
             let str = String(line)
-            // Skip header rows and separator
-            if str.hasPrefix("PID") || str.hasPrefix("--") { continue }
+            if str.hasPrefix("PID\t") { continue }
 
-            // Columns: pid(10) tty(17 = 10 + space) command(38) title(rest)
-            // Use simple space-split since ps output is space-padded.
-            let trimmed = str.trimmingCharacters(in: .whitespaces)
-            let parts = trimmed.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+            let parts = str.split(
+                separator: "\t",
+                maxSplits: 3,
+                omittingEmptySubsequences: false
+            )
                 .map { String($0) }
-            guard parts.count >= 2 else { continue }
+
+            guard parts.count == 4 else { continue }
             guard let pid = Int(parts[0]) else { continue }
-            let tty = parts[1]
-            let remainder = parts.count >= 3 ? parts[2] : ""
-            // Split remainder into command + tab title. The command column is
-            // 37 chars wide in the CLI output; title starts after that.
-            if remainder.count > 37 {
-                let cmd = String(remainder.prefix(37)).trimmingCharacters(in: .whitespaces)
-                let title = String(remainder.dropFirst(37)).trimmingCharacters(in: .whitespaces)
-                entries.append(PIDEntry(pid: pid, tty: tty, command: cmd, tabTitle: title))
-            } else {
-                entries.append(PIDEntry(pid: pid, tty: tty, command: remainder, tabTitle: ""))
-            }
+            entries.append(
+                PIDEntry(
+                    pid: pid,
+                    tty: parts[1],
+                    command: parts[2],
+                    tabTitle: parts[3]
+                )
+            )
         }
-        return entries.sorted { $0.pid < $1.pid }
+        return entries
     }
 }

@@ -2,73 +2,31 @@ import Foundation
 import Darwin
 
 // MARK: - ListCommand (-list)
-/// Lists the PIDs of running terminal sessions, associating each TTY with its
-/// process. Combines `ps` (PID/TTY/comm) with AppleScript (visible tab title
-/// in Terminal.app) to make identifying the target session easier.
+/// Lists one valid agent session per leaf TTY. A session is valid when its
+/// foreground process group contains a supported LLM agent. This deliberately
+/// excludes idle shells, helper processes, and outer multiplexer terminals.
 enum ListCommand {
     static func run() {
         fflush(stdout)
 
-        // 1) List processes associated with ttys* TTYs via ps.
-        let psLines = runPS()
-        guard !psLines.isEmpty else {
-            print("No terminal with a ttys* TTY found.")
+        let sessions = TerminalSessionDiscovery.discover()
+        guard !sessions.isEmpty else {
+            print("No supported agent session found.")
             fflush(stdout)
             return
         }
 
-        // 2) Best-effort: map TTY -> tab title via AppleScript (Terminal.app).
-        //    If Automation is slow/denied, proceeds without titles.
         let ttyTitles = fetchTerminalTabTitles(timeoutSeconds: 8)
 
-        // 3) Output
-        print("PID        TTY              COMMAND                                  TAB (Terminal.app)")
-        print("---------- ---------------- --------------------------------------- ----------------")
-        for line in psLines {
-            let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
-                .map { String($0) }
-            guard parts.count >= 3 else { continue }
-            let pid = parts[0]
-            let tty = parts[1]
-            let comm = parts[2]
-            let ttyPath = tty.hasPrefix("/dev/") ? tty : "/dev/\(tty)"
+        print("PID\tTTY\tAGENT\tTAB")
+        for session in sessions {
+            let ttyPath = session.tty.hasPrefix("/dev/") ? session.tty : "/dev/\(session.tty)"
             let title = ttyTitles[ttyPath] ?? ""
-            let pidPad = pid.padding(toLength: 10, withPad: " ", startingAt: 0)
-            let ttyPad = tty.padding(toLength: 16, withPad: " ", startingAt: 0)
-            let commPadded = comm.padding(toLength: 39, withPad: " ", startingAt: 0)
-            print("\(pidPad) \(ttyPad) \(commPadded) \(title)")
+            print("\(session.pid)\t\(session.tty)\t\(session.agent.displayName)\t\(title)")
         }
         print("")
-        print("\(psLines.count) session(s) listed. Use the desired PID in: \(exeName()) <pid> \"text\" <seconds>")
+        print("\(sessions.count) valid agent session(s) listed. Use the desired PID in: \(exeName()) <pid> \"text\" <seconds>")
         fflush(stdout)
-    }
-
-    // MARK: - ps
-
-    /// Runs `ps -e -o pid=,tty=,comm=` and returns only lines whose TTY starts
-    /// with "ttys" (interactive session terminals).
-    private static func runPS() -> [String] {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/ps")
-        process.arguments = ["-e", "-o", "pid=,tty=,comm="]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = FileHandle(forWritingAtPath: "/dev/null")
-        do { try process.run() } catch { return [] }
-        // Read concurrently to avoid deadlock when output exceeds the pipe
-        // buffer (64 KB). If we read only after waitUntilExit, `ps` blocks on
-        // write and neither completes.
-        let handle = pipe.fileHandleForReading
-        var outData = Data()
-        let readQ = DispatchQueue(label: "list.ps.read")
-        readQ.async { outData = handle.readDataToEndOfFile() }
-        process.waitUntilExit()
-        readQ.sync { } // wait for the read to complete
-        guard process.terminationStatus == 0 else { return [] }
-        guard let raw = String(data: outData, encoding: .utf8) else { return [] }
-        return raw.split(separator: "\n")
-            .map { String($0) }
-            .filter { $0.trimmingCharacters(in: .whitespaces).contains("ttys") }
     }
 
     // MARK: - AppleScript: Terminal tab titles (best-effort, with timeout)

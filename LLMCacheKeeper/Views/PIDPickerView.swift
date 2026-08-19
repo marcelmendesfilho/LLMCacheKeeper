@@ -20,7 +20,7 @@ struct PIDPickerView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Select a PID")
+                Text("Select an Agent Session")
                     .font(.title2.bold())
                 Spacer()
                 if isLoading {
@@ -39,7 +39,7 @@ struct PIDPickerView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField("Filter by PID, TTY, command or tab title", text: $searchText)
+                TextField("Filter by agent, TTY, PID or tab title", text: $searchText)
                     .textFieldStyle(.plain)
                     .onSubmit { Task { await load() } }
             }
@@ -49,9 +49,9 @@ struct PIDPickerView: View {
 
             if entries.isEmpty && !isLoading {
                 ContentUnavailableView(
-                    "No sessions found",
+                    "No Valid Agent Sessions",
                     systemImage: "terminal",
-                    description: Text("Make sure the CLI binary path is correct and run \(binaryPath) -list in a terminal to verify.")
+                    description: Text("Start Codex, Claude, or OpenCode in a terminal session. Outer multiplexer terminals and idle shells are hidden.")
                 )
                 .frame(maxHeight: .infinity)
             } else {
@@ -83,17 +83,17 @@ private struct PIDPickerRow: View {
     var body: some View {
         Button(action: onSelect) {
             HStack {
-                Text("\(entry.pid)")
+                Text(entry.command)
                     .font(.system(.body, design: .monospaced).weight(.semibold))
-                    .frame(width: 60, alignment: .leading)
+                    .frame(width: 90, alignment: .leading)
                     .foregroundStyle(Color.accentColor)
                 Text(entry.tty)
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .frame(width: 90, alignment: .leading)
-                Text(entry.command)
-                    .font(.callout)
-                    .lineLimit(1)
+                Text("PID \(entry.pid)")
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if !entry.tabTitle.isEmpty {
                     Text(entry.tabTitle)

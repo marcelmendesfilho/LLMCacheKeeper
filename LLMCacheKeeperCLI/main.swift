@@ -7,7 +7,7 @@ func printUsage() {
     let lines = [
         "Usage:",
         "  sudo \(exe) <pid> <text> <interval_seconds> [typing_delay_ms]   Injects text + ENTER into the target PID's terminal in a loop",
-        "  \(exe) -list                                Lists PIDs of running terminal sessions",
+        "  \(exe) -list                                Lists supported agents on valid leaf TTYs",
         "  \(exe) -setup                               Shows macOS setup / permission instructions",
         "  \(exe) -doctor                              Checks that all required permissions and conditions are met",
         "  \(exe) -help                                Displays this help",

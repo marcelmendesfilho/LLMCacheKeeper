@@ -53,7 +53,7 @@ sudo LLMCacheKeeperCLI <pid> <text> <interval_seconds> [typing_delay_ms]
   interval_seconds   Time (in seconds, accepts decimals) between each injection
   typing_delay_ms    (optional) Delay in ms between each character (default 5).
 
-LLMCacheKeeperCLI -list     Lists PIDs of running terminal sessions
+LLMCacheKeeperCLI -list     Lists supported agents running on valid leaf TTYs
 LLMCacheKeeperCLI -setup   Shows macOS setup / permission instructions
 LLMCacheKeeperCLI -doctor  Checks that all required permissions and conditions are met
 LLMCacheKeeperCLI -help    Displays help
@@ -126,7 +126,7 @@ echo $$
 LLMCacheKeeperCLI -list
 ```
 
-This lists every process attached to a `ttys*` TTY, along with the command name and (when available) the Terminal.app tab title. Find the row for the shell (e.g. `zsh`, `bash`) running in the same TTY as your agent and copy its PID. TIOCSTI injects into the TTY, so targeting the shell PID ensures the keystrokes reach any process sharing that terminal — including `codex`, `claude`, or `opencode` running in the foreground.
+This lists one supported foreground agent per leaf `ttys*` TTY, along with its PID and (when available) the Terminal.app tab title. Idle shells, helper processes, duplicate PIDs from the same TTY, and outer multiplexer terminals are omitted. Select the row for `codex`, `claude`, or `opencode` running in the desired terminal or multiplexer pane.
 
 ---
 
